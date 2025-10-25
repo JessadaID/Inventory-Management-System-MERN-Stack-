@@ -1,9 +1,13 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
-const PORT = 3000;
+require('dotenv').config();
+
+const PORT = process.env.PORT || 3000;
+
 const productsRouter = require("./routes/products");
 const userRouter = require("./routes/users");
+const inventoryRouter = require("./routes/inventory");
 
 // Middleware
 app.use(cors());
@@ -12,6 +16,7 @@ app.use(express.json());
 // Routes
 app.use("/api/products", productsRouter);
 app.use("/api/users", userRouter);
+app.use("/api/inventory", inventoryRouter);
 
 // Home Route
 app.get("/", (req, res) => {
