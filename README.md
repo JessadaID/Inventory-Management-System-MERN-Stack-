@@ -60,8 +60,8 @@
 
 ใช้สำหรับจัดการการเคลื่อนไหวของสต็อกสินค้า
 
-| Method | Endpoint                     | Description                                 | Request Body Example                             |
-| ------ | ---------------------------- | ------------------------------------------- | ------------------------------------------------ | ------------------------------------------------------------ |
+| Method | Endpoint | Description      | Request Body Example   |
+| ------ | -------- | --------------- | --------------------- |
 | GET    | /api/inventory/low-stock     | ดึงรายการสินค้าที่สต็อกต่ำกว่าเกณฑ์         | N/A                                              |
 | POST   | /api/inventory/inbound       |                                             | บันทึกการรับเข้า (Stock In)                      | { productId, quantity: 10, note: "รับสินค้าจาก Supplier A" } |
 | POST   | /api/inventory/outbound      | บันทึกการเบิกออก (Stock Out)                | { productId, quantity: 5, note: "เบิกไปสาขา B" } |
