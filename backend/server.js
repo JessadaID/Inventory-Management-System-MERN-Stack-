@@ -18,10 +18,11 @@ connectDB();
 app.use(cors());
 app.use(express.json());
 
-// Routes
-app.use("/api/products", productsRouter);
-app.use("/api/users", userRouter);
-app.use("/api/inventory", inventoryRouter);
+// Request logging
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+  next();
+});
 
 // Rate Limiter
 const apiLimiter = rateLimit({
@@ -61,6 +62,12 @@ app.get('/health', (req, res) => {
     }
   });
 });
+
+
+// Routes
+app.use("/api/products", productsRouter);
+app.use("/api/users", userRouter);
+app.use("/api/inventory", inventoryRouter);
 
 // Error Handler
 app.use((err, req, res, next) => {
