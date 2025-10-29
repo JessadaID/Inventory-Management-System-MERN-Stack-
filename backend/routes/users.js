@@ -12,11 +12,11 @@ const {
 // get current user profile
 router.get("/profile", authenticateToken, getUserProfile);
 
+router.put("/profile", authenticateToken, editProfile);
+
 router.post("/register", registerUser);
 
 router.post("/login", loginUser);
-
-router.put("/profile", authenticateToken, editProfile);
 
 router.post("/logout", logoutUser);
 
