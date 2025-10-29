@@ -1,4 +1,4 @@
-const Product = require("../models/productModel");
+const Product = require("../models/Product");
 
 /**
  * POST	/api/products	เพิ่ม สินค้าใหม่	{ name, sku, category, stockCount, price, description }

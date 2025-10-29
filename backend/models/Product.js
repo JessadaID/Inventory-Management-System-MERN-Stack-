@@ -25,7 +25,7 @@ const productsSchema = new mongoose.Schema(
       required: false,
     },
     category: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
       required: true,
     },
@@ -40,7 +40,7 @@ const productsSchema = new mongoose.Schema(
     lastUpdatedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: false,
+      required: true,
     },
   },
   { timestamps: true }
