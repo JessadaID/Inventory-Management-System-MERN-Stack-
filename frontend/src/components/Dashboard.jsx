@@ -1,68 +1,99 @@
-import React, { useState } from 'react';
-import { Package, Users, AlertCircle, TrendingUp, Plus, Search, Bell, LogOut, Menu, X, ChevronRight } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import {
+  Package,
+  Users,
+  AlertCircle,
+  TrendingUp,
+  Plus,
+  Search,
+  Bell,
+  LogOut,
+  Menu,
+  X,
+  ChevronRight,
+} from "lucide-react";
 
 const Dashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [Movement, setMovement] = useState([]);
+  const [Products, setProducts] = useState([]);
+
+  useEffect(() => {
+    async function fetchMovements() {
+      try {
+        const response = await fetch(
+          "http://localhost:3000/api/inventory/movements?limit=5"
+        );
+        const data = await response.json();
+        setMovement(data.movements);
+      } catch (error) {
+        console.error("Error fetching movements:", error);
+      }
+    }
+    async function fetchProducts() {
+      try {
+        const response = await fetch(
+          "http://localhost:3000/api/products?limit=5"
+        );
+        const data = await response.json();
+        setProducts(data.products);
+        } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    }
+
+    fetchProducts();
+    fetchMovements();
+  }, []);
 
   // Mock data
   const stats = [
-    { 
-      title: 'สินค้าทั้งหมด', 
-      value: '1,234', 
-      icon: Package, 
-      color: 'bg-blue-50 text-blue-600',
-      trend: '+12%'
+    {
+      title: "สินค้าทั้งหมด",
+      value: "1,234",
+      icon: Package,
+      color: "bg-blue-50 text-blue-600",
+      trend: "+12%",
     },
-    { 
-      title: 'สต็อกต่ำ', 
-      value: '23', 
-      icon: AlertCircle, 
-      color: 'bg-red-50 text-red-600',
-      trend: '-5%'
+    {
+      title: "สต็อกต่ำ",
+      value: "23",
+      icon: AlertCircle,
+      color: "bg-red-50 text-red-600",
+      trend: "-5%",
     },
-    { 
-      title: 'ผู้ใช้งาน', 
-      value: '45', 
-      icon: Users, 
-      color: 'bg-green-50 text-green-600',
-      trend: '+3%'
+    {
+      title: "ผู้ใช้งาน",
+      value: "45",
+      icon: Users,
+      color: "bg-green-50 text-green-600",
+      trend: "+3%",
     },
-    { 
-      title: 'มูลค่ารวม', 
-      value: '฿2.5M', 
-      icon: TrendingUp, 
-      color: 'bg-purple-50 text-purple-600',
-      trend: '+18%'
+    {
+      title: "มูลค่ารวม",
+      value: "฿2.5M",
+      icon: TrendingUp,
+      color: "bg-purple-50 text-purple-600",
+      trend: "+18%",
     },
-  ];
-
-  const recentProducts = [
-    { id: 1, name: 'MacBook Pro 16"', sku: 'MBP-001', stock: 15, category: 'Electronics', status: 'normal' },
-    { id: 2, name: 'iPhone 15 Pro', sku: 'IPH-015', stock: 8, category: 'Electronics', status: 'low' },
-    { id: 3, name: 'Magic Mouse', sku: 'MMS-003', stock: 45, category: 'Accessories', status: 'normal' },
-    { id: 4, name: 'AirPods Pro', sku: 'APP-002', stock: 3, category: 'Audio', status: 'critical' },
-    { id: 5, name: 'iPad Air', sku: 'IPA-005', stock: 22, category: 'Electronics', status: 'normal' },
-  ];
-
-  const recentActivities = [
-    { id: 1, action: 'รับเข้าสินค้า', product: 'MacBook Pro 16"', qty: 10, time: '10 นาทีที่แล้ว', type: 'in' },
-    { id: 2, action: 'เบิกออก', product: 'iPhone 15 Pro', qty: 5, time: '1 ชั่วโมงที่แล้ว', type: 'out' },
-    { id: 3, action: 'เพิ่มสินค้าใหม่', product: 'Magic Keyboard', qty: 0, time: '2 ชั่วโมงที่แล้ว', type: 'new' },
-    { id: 4, action: 'รับเข้าสินค้า', product: 'AirPods Pro', qty: 15, time: '3 ชั่วโมงที่แล้ว', type: 'in' },
   ];
 
   const menuItems = [
-    { name: 'Dashboard', icon: TrendingUp, active: true },
-    { name: 'จัดการสินค้า', icon: Package, active: false },
-    { name: 'จัดการผู้ใช้', icon: Users, active: false },
-    { name: 'แจ้งเตือน', icon: Bell, active: false },
+    { name: "Dashboard", icon: TrendingUp, active: true },
+    { name: "จัดการสินค้า", icon: Package, active: false },
+    { name: "จัดการผู้ใช้", icon: Users, active: false },
+    { name: "แจ้งเตือน", icon: Bell, active: false },
   ];
 
   return (
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar */}
-      <aside className={`${isSidebarOpen ? 'w-64' : 'w-0'} relative bg-white border-r border-gray-200 transition-all duration-300 overflow-hidden`}>
+      <aside
+        className={`${
+          isSidebarOpen ? "w-64" : "w-0"
+        } relative bg-white border-r border-gray-200 transition-all duration-300 overflow-hidden`}
+      >
         <div className="p-6">
           <div className="flex items-center gap-3 mb-8">
             <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
@@ -79,9 +110,9 @@ const Dashboard = () => {
               <button
                 key={index}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                  item.active 
-                    ? 'bg-blue-50 text-blue-600' 
-                    : 'text-gray-600 hover:bg-gray-50'
+                  item.active
+                    ? "bg-blue-50 text-blue-600"
+                    : "text-gray-600 hover:bg-gray-50"
                 }`}
               >
                 <item.icon className="w-5 h-5" />
@@ -98,7 +129,9 @@ const Dashboard = () => {
                 <span className="text-sm font-semibold text-gray-700">AD</span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-800 truncate">Admin User</p>
+                <p className="text-sm font-medium text-gray-800 truncate">
+                  Admin User
+                </p>
                 <p className="text-xs text-gray-500">admin@stockflow.com</p>
               </div>
               <button className="text-gray-400 hover:text-gray-600">
@@ -115,14 +148,20 @@ const Dashboard = () => {
         <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
           <div className="flex items-center justify-between px-8 py-4">
             <div className="flex items-center gap-4">
-              <button 
+              <button
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                 className="text-gray-600 hover:text-gray-800"
               >
-                {isSidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                {isSidebarOpen ? (
+                  <X className="w-6 h-6" />
+                ) : (
+                  <Menu className="w-6 h-6" />
+                )}
               </button>
               <div>
-                <h2 className="text-2xl font-semibold text-gray-800">Dashboard</h2>
+                <h2 className="text-2xl font-semibold text-gray-800">
+                  Dashboard
+                </h2>
                 <p className="text-sm text-gray-500">ภาพรวมระบบสต็อกสินค้า</p>
               </div>
             </div>
@@ -151,28 +190,41 @@ const Dashboard = () => {
           {/* Stats Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {stats.map((stat, index) => (
-              <div key={index} className="bg-white rounded-xl p-6 border border-gray-200 hover:shadow-lg transition-shadow">
+              <div
+                key={index}
+                className="bg-white rounded-xl p-6 border border-gray-200 hover:shadow-lg transition-shadow"
+              >
                 <div className="flex items-start justify-between mb-4">
-                  <div className={`${stat.color} w-12 h-12 rounded-lg flex items-center justify-center`}>
+                  <div
+                    className={`${stat.color} w-12 h-12 rounded-lg flex items-center justify-center`}
+                  >
                     <stat.icon className="w-6 h-6" />
                   </div>
-                  <span className="text-sm font-medium text-green-600">{stat.trend}</span>
+                  <span className="text-sm font-medium text-green-600">
+                    {stat.trend}
+                  </span>
                 </div>
                 <h3 className="text-sm text-gray-600 mb-1">{stat.title}</h3>
-                <p className="text-3xl font-semibold text-gray-800">{stat.value}</p>
+                <p className="text-3xl font-semibold text-gray-800">
+                  {stat.value}
+                </p>
               </div>
             ))}
           </div>
 
-            {/* Quick Actions */}
+          {/* Quick Actions */}
           <div className="mt-6 bg-white rounded-xl border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">การดำเนินการด่วน</h3>
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+              การดำเนินการด่วน
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <button className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors group">
                 <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-200">
                   <Plus className="w-5 h-5 text-blue-600" />
                 </div>
-                <span className="font-medium text-gray-700">เพิ่มสินค้าใหม่</span>
+                <span className="font-medium text-gray-700">
+                  เพิ่มสินค้าใหม่
+                </span>
               </button>
               <button className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors group">
                 <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center group-hover:bg-green-200">
@@ -200,7 +252,9 @@ const Dashboard = () => {
             <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200">
               <div className="p-6 border-b border-gray-200">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-gray-800">สินค้าล่าสุด</h3>
+                  <h3 className="text-lg font-semibold text-gray-800">
+                    สินค้าล่าสุด
+                  </h3>
                   <button className="flex items-center gap-2 text-blue-600 hover:text-blue-700 text-sm font-medium">
                     ดูทั้งหมด <ChevronRight className="w-4 h-4" />
                   </button>
@@ -210,31 +264,58 @@ const Dashboard = () => {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-gray-200">
-                      <th className="text-left py-3 px-6 text-sm font-medium text-gray-600">สินค้า</th>
-                      <th className="text-left py-3 px-6 text-sm font-medium text-gray-600">SKU</th>
-                      <th className="text-left py-3 px-6 text-sm font-medium text-gray-600">หมวดหมู่</th>
-                      <th className="text-left py-3 px-6 text-sm font-medium text-gray-600">สต็อก</th>
-                      <th className="text-left py-3 px-6 text-sm font-medium text-gray-600">สถานะ</th>
+                      <th className="text-left py-3 px-6 text-sm font-medium text-gray-600">
+                        สินค้า
+                      </th>
+                      <th className="text-left py-3 px-6 text-sm font-medium text-gray-600">
+                        SKU
+                      </th>
+                      <th className="text-left py-3 px-6 text-sm font-medium text-gray-600">
+                        หมวดหมู่
+                      </th>
+                      <th className="text-left py-3 px-6 text-sm font-medium text-gray-600">
+                        สต็อก
+                      </th>
+                      <th className="text-left py-3 px-6 text-sm font-medium text-gray-600">
+                        สถานะ
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
-                    {recentProducts.map((product) => (
-                      <tr key={product.id} className="border-b border-gray-100 hover:bg-gray-50">
+                    {Products.map((product) => (
+                      <tr
+                        key={product._id}
+                        className="border-b border-gray-100 hover:bg-gray-50"
+                      >
                         <td className="py-4 px-6">
-                          <p className="font-medium text-gray-800">{product.name}</p>
+                          <p className="font-medium text-gray-800">
+                            {product.name}
+                          </p>
                         </td>
-                        <td className="py-4 px-6 text-gray-600">{product.sku}</td>
-                        <td className="py-4 px-6 text-gray-600">{product.category}</td>
-                        <td className="py-4 px-6 font-medium text-gray-800">{product.stock}</td>
+                        <td className="py-4 px-6 text-gray-600">
+                          {product.sku}
+                        </td>
+                        <td className="py-4 px-6 text-gray-600">
+                          {product.category.name}
+                        </td>
+                        <td className="py-4 px-6 font-medium text-gray-800">
+                          {product.stockCount}
+                        </td>
                         <td className="py-4 px-6">
-                          <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
-                            product.status === 'normal' 
-                              ? 'bg-green-50 text-green-700' 
-                              : product.status === 'low'
-                              ? 'bg-yellow-50 text-yellow-700'
-                              : 'bg-red-50 text-red-700'
-                          }`}>
-                            {product.status === 'normal' ? 'ปกติ' : product.status === 'low' ? 'ต่ำ' : 'วิกฤต'}
+                          <span
+                            className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
+                              product.stockLevel === "High"
+                                ? "bg-green-50 text-green-700"
+                                : product.stockLevel === "Normal"
+                                ? "bg-yellow-50 text-yellow-700"
+                                : "bg-red-50 text-red-700"
+                            }`}
+                          >
+                            {product.stockLevel === "High"
+                              ? "ปกติ"
+                              : product.stockLevel === "Normal"
+                              ? "ต่ำ"
+                              : "วิกฤต"}
                           </span>
                         </td>
                       </tr>
@@ -247,33 +328,47 @@ const Dashboard = () => {
             {/* Recent Activities */}
             <div className="bg-white rounded-xl border border-gray-200">
               <div className="p-6 border-b border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-800">กิจกรรมล่าสุด</h3>
+                <h3 className="text-lg font-semibold text-gray-800">
+                  กิจกรรมล่าสุด
+                </h3>
               </div>
               <div className="p-6 space-y-4">
-                {recentActivities.map((activity) => (
-                  <div key={activity.id} className="flex gap-4">
-                    <div className={`w-2 h-2 mt-2 rounded-full flex-shrink-0 ${
-                      activity.type === 'in' 
-                        ? 'bg-green-500' 
-                        : activity.type === 'out'
-                        ? 'bg-red-500'
-                        : 'bg-blue-500'
-                    }`}></div>
+                {Movement.map((activity) => (
+                  <div key={activity._id} className="flex gap-4">
+                    <div
+                      className={`w-2 h-2 mt-2 rounded-full flex-shrink-0 ${
+                        activity.type === "INBOUND"
+                          ? "bg-green-500"
+                          : activity.type === "OUTBOUND"
+                          ? "bg-red-500"
+                          : "bg-blue-500"
+                      }`}
+                    ></div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-800">{activity.action}</p>
-                      <p className="text-sm text-gray-600 truncate">{activity.product}</p>
-                      {activity.qty > 0 && (
-                        <p className="text-xs text-gray-500">จำนวน: {activity.qty} ชิ้น</p>
+                      <p className="text-sm font-medium text-gray-800">
+                        {activity.type === "INBOUND"
+                          ? "รับเข้าสินค้า"
+                          : activity.type === "OUTBOUND"
+                          ? "เบิกออก"
+                          : "เพิ่มสินค้าใหม่"    }
+                      </p>
+                      <p className="text-sm text-gray-600 truncate">
+                        {activity.product.name}
+                      </p>
+                      {activity.quantity > 0 && (
+                        <p className="text-xs text-gray-500">
+                          จำนวน: {activity.quantity} ชิ้น
+                        </p>
                       )}
-                      <p className="text-xs text-gray-400 mt-1">{activity.time}</p>
+                      <p className="text-xs text-gray-400 mt-1">
+                        {activity.updatedAt.toLocaleString().replace("T", " ").slice(0, 19)}
+                      </p>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
           </div>
-
-          
         </div>
       </main>
     </div>

@@ -8,6 +8,17 @@ const Product = require("../models/Product");
  * DELETE	/api/products/:id	ลบ สินค้าตาม ID	N/A
  */
 
+function stockLevelValidator(stockCount , lowStockLevel) {
+  const highStockLevel = lowStockLevel + 10;
+  if (stockCount <= lowStockLevel) {
+    return "Low";
+  }else if (stockCount <= highStockLevel) {
+    return "Medium";
+  } else {
+    return "High";
+  }
+}
+
 const createProduct = async (req, res) => {
   try {
     const productsData = req.body;
@@ -68,15 +79,20 @@ const getallProducts = async (req, res) => {
       name: { $regex: search, $options: "i" },
       ...(category && { category }),
     })
-      .limit(limit)
+      .limit(limit).populate("category", "name")
+      .sort({ name: 1 })
       .skip((page - 1) * limit);
+
     res.json({
       success: true,
       message: "Products retrieved successfully",
       page: page,
       limit: limit,
       total: products.length,
-      products: products,
+      products: products.map(product => ({
+        ...product.toObject(),
+        stockLevel: stockLevelValidator(product.stockCount, product.minStockLevel)
+      })),
     });
   } catch (error) {
     res.status(500).json({

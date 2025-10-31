@@ -9,7 +9,7 @@ const {
 } = require("../controller/inventoryController");
 const authenticateToken = require("../middleware/auth");
 
-router.get("/low-stock", authenticateToken, getLowStockProducts);
+router.get("/low-stock",  getLowStockProducts);
 
 router.post("/inbound", authenticateToken, recordInbound);
 
