@@ -134,7 +134,7 @@ const recordOutbound = async (req, res) => {
   }
 };
 
-const getProductMovements = async (req, res) => {
+const getProductMovementsbyId = async (req, res) => {
   try {
     const productId = req.params.id;
 
@@ -168,9 +168,30 @@ const getProductMovements = async (req, res) => {
   }
 };
 
+const getProductMovements = async (req, res) => {
+  const limit = parseInt(req.query.limit) || 100; // กำหนดค่าเริ่มต้นเป็น 100 ถ้าไม่มีการส่งมา
+  try {
+    const movements = await InventoryMovement.find().limit(limit)
+      .populate("product", "name sku") // ดึงข้อมูลสินค้า
+      .populate("user", "name email") // ดึงข้อมูลผู้ที่ทำรายการ
+      .sort({ movementDate: -1 }); // เรียงจากรายการล่าสุด
+    res.status(200).json({
+      success: true,
+      total: movements.length,
+      movements: movements,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: `Server error : ${error.message}`,
+    });
+  }
+};
+
 module.exports = {
   getLowStockProducts,
   recordInbound,
   recordOutbound,
   getProductMovements,
+  getProductMovementsbyId,
 };

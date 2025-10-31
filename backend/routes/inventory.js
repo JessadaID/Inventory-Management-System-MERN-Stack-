@@ -5,6 +5,7 @@ const {
   recordInbound,
   recordOutbound,
   getProductMovements,
+  getProductMovementsbyId,
 } = require("../controller/inventoryController");
 const authenticateToken = require("../middleware/auth");
 
@@ -14,6 +15,8 @@ router.post("/inbound", authenticateToken, recordInbound);
 
 router.post("/outbound", recordOutbound);
 
-router.get("/movements/:id", getProductMovements);
+router.get("/movements/:id", getProductMovementsbyId);
+
+router.get("/movements", getProductMovements);
 
 module.exports = router;
