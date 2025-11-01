@@ -1,18 +1,22 @@
 import UserContext from "../context/userContext";
-import { useEffect, useContext } from "react";
-import { Link } from "react-router-dom";
+import { useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import logout from "./auth/Logout";
 
 function Navbar() {
   const { user, setUser } = useContext(UserContext);
-  const seeduser = {
-    name: "John Doe",
-    email: "ipnioko54@gmail.com",
-    password: "password123",
-  };
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    setUser(seeduser);
-  }, []);
+  const handleLogout = async () => {
+    const result = await logout();
+    if (result.success) {
+      setUser(null);
+      alert("ออกจากระบบสำเร็จ");
+      navigate("/");
+    } else {
+      alert("เกิดข้อผิดพลาดในการออกจากระบบ");
+    }
+  };
 
   return (
     <nav className="bg-emerald-600 p-4 text-white">
@@ -20,13 +24,14 @@ function Navbar() {
         <div className="text-lg font-bold">Inventory Management</div>
         <Link to="/"> Home</Link>
         <div>
-          {user ? (
-            <span>Welcome, {user.name}</span>
-          ) : (
-            <span>Loading user...</span>
-          )}
+          {user ? ( // If user exists, show welcome and logout
+            <>
+              <span>Welcome, {user.name}</span>
+              <button onClick={handleLogout} className="ml-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Logout</button>
+            </>
+          ) : null}
         </div>
-        <Link to="/Login"> Login</Link>
+        {!user && <Link to="/Login"> Login</Link>}
         <Link to="/Register"> Register</Link>
         <Link to="/Dashboard"> Dashboard</Link>
       </div>

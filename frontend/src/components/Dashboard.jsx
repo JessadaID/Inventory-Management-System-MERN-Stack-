@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   Package,
   Users,
@@ -13,10 +13,13 @@ import {
   ChevronRight,
 } from "lucide-react";
 import moneyFormat from "../utils/moneyformat";
+import logout from "./auth/Logout";
+import UserContext from "../context/userContext";
 import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const { user, setUser } = useContext(UserContext);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [Movement, setMovement] = useState([]);
@@ -50,9 +53,15 @@ const Dashboard = () => {
     fetchMovements();
   }, []);
 
-  function Logout(){
-    localStorage.removeItem("token");
-    navigate("/");
+  async function handleLogout() {
+    const result = await logout();
+    if (result.success) {
+      setUser(null);
+      alert("ออกจากระบบสำเร็จ");
+      navigate("/");
+    } else {
+      alert("เกิดข้อผิดพลาดในการออกจากระบบ");
+    }
   }
 
   // Mock data
@@ -134,15 +143,15 @@ const Dashboard = () => {
           <div className="bg-gray-50 rounded-lg p-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
-                <span className="text-sm font-semibold text-gray-700">AD</span>
+                <span className="text-sm font-semibold text-gray-700">{user?.name?.substring(0, 2).toUpperCase() || 'AD'}</span>
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-800 truncate">
-                  Admin User
+                  {user?.name || 'Admin User'}
                 </p>
-                <p className="text-xs text-gray-500">admin@stockflow.com</p>
+                <p className="text-xs text-gray-500">{user?.email || 'admin@stockflow.com'}</p>
               </div>
-              <button className="text-gray-400 hover:text-gray-600" onClick={Logout}>
+              <button className="text-gray-400 hover:text-gray-600" onClick={handleLogout}>
                 <LogOut className="w-5 h-5"/>
               </button>
             </div>

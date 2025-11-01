@@ -1,19 +1,43 @@
-import { useState } from 'react';
-import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { useState, useContext } from "react";
+import { Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { Link } from "react-router-dom";
+import  UserContext  from "../../context/userContext.jsx";
 
 function Login() {
   const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const { setUser } = useContext(UserContext);
 
-  const handleSubmit = () => {
-    setIsLoading(true);
-    setTimeout(() => {
+  const handleSubmit = async () => {
+
+    try {
+      setIsLoading(true);
+
+      const respond = await fetch("http://localhost:3000/api/users/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await respond.json();
+
+      if (data.success) {
+        setUser(data.user);
+        alert("เข้าสู่ระบบสำเร็จ!");
+      } else {
+        alert(`เข้าสู่ระบบไม่สำเร็จ: ${data.message}`);
+      }
+
       setIsLoading(false);
-      alert('เข้าสู่ระบบสำเร็จ!');
-    }, 1500);
+
+    } catch (error) {
+      console.error("Login failed:", error);
+    }
   };
 
   return (
@@ -23,7 +47,9 @@ function Login() {
           <div className="inline-flex items-center justify-center w-14 h-14 bg-gray-900 rounded-full mb-6">
             <Lock className="w-6 h-6 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">ยินดีต้อนรับกลับ</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            ยินดีต้อนรับกลับ
+          </h1>
           <p className="text-gray-500">เข้าสู่ระบบเพื่อดำเนินการต่อ</p>
         </div>
 
@@ -52,7 +78,7 @@ function Login() {
               <div className="relative">
                 <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
@@ -90,20 +116,23 @@ function Login() {
               disabled={isLoading}
               className="w-full py-3 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-6"
             >
-              {isLoading ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบ'}
+              {isLoading ? "กำลังเข้าสู่ระบบ..." : "เข้าสู่ระบบ"}
             </button>
           </div>
 
           <div className="mt-6 text-center text-sm text-gray-600">
-            ยังไม่มีบัญชี?{' '}
-            <Link to="/Register" className="text-gray-900 hover:underline font-medium">
+            ยังไม่มีบัญชี?{" "}
+            <Link
+              to="/Register"
+              className="text-gray-900 hover:underline font-medium"
+            >
               สมัครสมาชิก
             </Link>
           </div>
         </div>
 
         <p className="text-center text-xs text-gray-400 mt-8">
-          การเข้าสู่ระบบแสดงว่าคุณยอมรับ{' '}
+          การเข้าสู่ระบบแสดงว่าคุณยอมรับ{" "}
           <button className="hover:text-gray-600 transition-colors">
             เงื่อนไขการใช้งาน
           </button>
