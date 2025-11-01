@@ -2,13 +2,18 @@ const User = require("../models/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
+const { generateToken } = require("../config/jwt");
 
-function generateAccessToken(user) {
-  return jwt.sign(user, process.env.JWT_SECRET, { expiresIn: "1h" });
-}
+const getUserProfile = async (req, res) => {
+  const user = await User.findById(req.user.id);
 
-const getUserProfile = (req, res) => {
-  const user = req.user;
+  if (!user) {
+    return res.status(404).json({
+      success: false,
+      message: "ไม่พบผู้ใช้งาน",
+    });
+  }
+
   res.json({
     success: true,
     message: "User profile retrieved successfully",
@@ -52,18 +57,20 @@ const registerUser = async (req, res) => {
     }
 
     const newUser = await User.create(user);
-    if (newUser) {
-      res.status(201).json({
-        success: true,
-        message: "User registered successfully",
-        user: newUser,
-      });
-    } else {
-      res.status(400).json({
-        success: false,
-        message: "User registration failed",
-      });
-    }
+
+    // ส่ง token เป็น cookie
+    res.cookie("token", token, {
+      httpOnly: true, // ป้องกัน JavaScript เข้าถึง
+      secure: process.env.NODE_ENV === "production", // HTTPS ใน production
+      sameSite: "strict", // ป้องกัน CSRF
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 วัน
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "User registered successfully",
+      user: newUser,
+    });
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -94,21 +101,31 @@ const loginUser = async (req, res) => {
     }
 
     if (user && isPasswordValid) {
-      const token = jwt.sign(
-        {
-          id: user._id,
-          email: user.email,
-          role: user.role,
-          name: user.name,
-        },
-        process.env.JWT_SECRET,
-        { expiresIn: "1h" }
-      );
+      // สร้าง token
+      const token = generateToken({
+        id: user._id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+      });
+
+      // ส่ง token เป็น cookie
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 วัน
+      });
+
       res.json({
         success: true,
-        message: "Authentication successful",
-        user: { email: user.email, role: user.role },
-        token: token,
+        message: "เข้าสู่ระบบสำเร็จ",
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+        },
       });
     }
   } catch (error) {
@@ -120,7 +137,7 @@ const loginUser = async (req, res) => {
 };
 
 const editProfile = async (req, res) => {
-    try {
+  try {
     const user = req.user;
 
     const updateinfo = await User.findByIdAndUpdate(user.id, req.body, {
@@ -134,18 +151,26 @@ const editProfile = async (req, res) => {
         message: "User not found",
       });
     }
-    const token = generateAccessToken({
+
+    const token = generateToken({
       id: updateinfo._id,
       email: updateinfo.email,
       role: updateinfo.role,
       name: updateinfo.name,
     });
 
+    // อัพเดท cookie
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
     res.json({
       success: true,
       message: "User profile updated successfully",
       user: updateinfo,
-      token: token,
     });
   } catch (error) {
     res.status(500).json({
@@ -156,12 +181,13 @@ const editProfile = async (req, res) => {
 };
 
 const logoutUser = (req, res) => {
+  res.clearCookie("token");
+
   res.json({
     success: true,
     message: "User logged out successfully",
   });
 };
-
 
 module.exports = {
   getUserProfile,

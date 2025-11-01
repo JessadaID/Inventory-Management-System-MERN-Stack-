@@ -3,7 +3,7 @@ const app = express();
 const cors = require("cors");
 require('dotenv').config();
 const rateLimit = require('express-rate-limit');
-
+const cookieParser = require('cookie-parser');
 const PORT = process.env.PORT || 3000;
 
 const productsRouter = require("./routes/products");
@@ -17,6 +17,7 @@ connectDB();
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 
 // Request logging
 app.use((req, res, next) => {
