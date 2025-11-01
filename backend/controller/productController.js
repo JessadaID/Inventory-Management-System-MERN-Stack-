@@ -68,36 +68,59 @@ const createProduct = async (req, res) => {
     });
   }
 };
-
 const getallProducts = async (req, res) => {
   let page = parseInt(req.query.page) || 1;
   let limit = parseInt(req.query.limit) || 10;
   let search = req.query.search || "";
   let category = req.query.category || "";
-  try {
-    const totalCount = await Product.countDocuments({});
 
-    const products = await Product.find({
+  try {
+    // 1. สร้างเงื่อนไขการค้นหา (Match Condition)
+    const matchCondition = {
       name: { $regex: search, $options: "i" },
       ...(category && { category }),
-    })
+    };
+
+    // 2. ดึงจำนวนทั้งหมด (Total Count) ที่ตรงตามเงื่อนไข
+    // ต้องเปลี่ยนมาใช้ matchCondition แทน {} เพื่อให้จำนวนถูกต้อง
+    const totalCount = await Product.countDocuments(matchCondition); 
+
+    // 3. คำนวณราคารวมทั้งหมด (Total Price) ที่ตรงตามเงื่อนไข
+    const aggregationResult = await Product.aggregate([
+      // A. ขั้นตอน Match: กรองสินค้าตาม search และ category
+      { $match: matchCondition },
+      // B. ขั้นตอน Group: รวมเอกสารทั้งหมดเป็นหนึ่งเดียวและคำนวณผลรวมของฟิลด์ price
+      { 
+        $group: {
+          _id: null, // รวมทั้งหมด
+          totalPrice: { $sum: "$price" },
+        } 
+      }
+    ]);
+
+    // ดึงค่า totalPrice จากผลลัพธ์ (ถ้ามีผลลัพธ์)
+    const totalDatabasePrice = 
+      aggregationResult.length > 0 ? aggregationResult[0].totalPrice : 0;
+    
+    // 4. ดึงข้อมูลสินค้าที่ถูกแบ่งหน้า (Pagination)
+    const products = await Product.find(matchCondition)
       .limit(limit)
       .populate("category", "name")
       .sort({ name: 1 })
       .skip((page - 1) * limit);
-      
+
+    // 5. คำนวณ lowStockcount เฉพาะในหน้านี้ (Current Page)
     const lowStockcount = products.filter(
       (product) =>
-        stockLevelValidator(product.stockCount, product.minStockLevel) ===
-        "Low"
+        stockLevelValidator(product.stockCount, product.minStockLevel) === "Low"
     ).length;
-
+    
     res.json({
       success: true,
       message: "Products retrieved successfully",
       page: page,
       limit: limit,
-      total: totalCount,
+      total: totalCount, // จำนวนสินค้าทั้งหมด (ที่ตรงเงื่อนไข)
       products: products.map((product) => ({
         ...product.toObject(),
         stockLevel: stockLevelValidator(
@@ -106,7 +129,9 @@ const getallProducts = async (req, res) => {
         ),
       })),
       lowStockcount: lowStockcount,
+      totalPrice: totalDatabasePrice, 
     });
+
   } catch (error) {
     res.status(500).json({
       success: false,

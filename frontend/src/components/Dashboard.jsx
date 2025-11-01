@@ -12,6 +12,7 @@ import {
   X,
   ChevronRight,
 } from "lucide-react";
+import moneyFormat from "../utils/moneyformat";
 
 const Dashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -44,7 +45,6 @@ const Dashboard = () => {
     }
 
     fetchProducts();
-    console.log(Products);
     fetchMovements();
   }, []);
 
@@ -73,7 +73,7 @@ const Dashboard = () => {
     },
     {
       title: "มูลค่ารวม",
-      value: "฿2.5M",
+      value: moneyFormat(Products.totalPrice || 0),
       icon: TrendingUp,
       color: "bg-purple-50 text-purple-600",
       trend: "+18%",
