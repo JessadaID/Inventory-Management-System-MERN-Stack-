@@ -169,17 +169,32 @@ const getProductMovementsbyId = async (req, res) => {
 };
 
 const getProductMovements = async (req, res) => {
-  const limit = parseInt(req.query.limit) || 100; // กำหนดค่าเริ่มต้นเป็น 100 ถ้าไม่มีการส่งมา
+  const limit = parseInt(req.query.limit) || 100;
+  const page = parseInt(req.query.page) || 1;
+  const skip = (page - 1) * limit;
+
   try {
-    const movements = await InventoryMovement.find().limit(limit)
+    // 1. ดึงจำนวนทั้งหมด (Total Count) โดยไม่มี limit หรือ sort
+    // **totalCount จะเป็นจำนวนรายการทั้งหมดในฐานข้อมูล**
+    const totalCount = await InventoryMovement.countDocuments({}); 
+
+    // 2. ดึงข้อมูลรายการจริง โดยมีการ limit, populate, และ sort
+    const movements = await InventoryMovement.find()
+      .skip(skip) // หากต้องการทำ pagination
+      .limit(limit) 
       .populate("product", "name sku") // ดึงข้อมูลสินค้า
       .populate("user", "name email") // ดึงข้อมูลผู้ที่ทำรายการ
       .sort({ movementDate: -1 }); // เรียงจากรายการล่าสุด
+
     res.status(200).json({
       success: true,
-      total: movements.length,
+      page: page,
+      limit: limit,
+      total: totalCount, 
+      currentCount: movements.length, 
       movements: movements,
     });
+
   } catch (error) {
     res.status(500).json({
       success: false,

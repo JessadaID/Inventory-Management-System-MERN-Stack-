@@ -8,11 +8,11 @@ const Product = require("../models/Product");
  * DELETE	/api/products/:id	ลบ สินค้าตาม ID	N/A
  */
 
-function stockLevelValidator(stockCount , lowStockLevel) {
+function stockLevelValidator(stockCount, lowStockLevel) {
   const highStockLevel = lowStockLevel + 10;
   if (stockCount <= lowStockLevel) {
     return "Low";
-  }else if (stockCount <= highStockLevel) {
+  } else if (stockCount <= highStockLevel) {
     return "Medium";
   } else {
     return "High";
@@ -75,24 +75,37 @@ const getallProducts = async (req, res) => {
   let search = req.query.search || "";
   let category = req.query.category || "";
   try {
+    const totalCount = await Product.countDocuments({});
+
     const products = await Product.find({
       name: { $regex: search, $options: "i" },
       ...(category && { category }),
     })
-      .limit(limit).populate("category", "name")
+      .limit(limit)
+      .populate("category", "name")
       .sort({ name: 1 })
       .skip((page - 1) * limit);
+      
+    const lowStockcount = products.filter(
+      (product) =>
+        stockLevelValidator(product.stockCount, product.minStockLevel) ===
+        "Low"
+    ).length;
 
     res.json({
       success: true,
       message: "Products retrieved successfully",
       page: page,
       limit: limit,
-      total: products.length,
-      products: products.map(product => ({
+      total: totalCount,
+      products: products.map((product) => ({
         ...product.toObject(),
-        stockLevel: stockLevelValidator(product.stockCount, product.minStockLevel)
+        stockLevel: stockLevelValidator(
+          product.stockCount,
+          product.minStockLevel
+        ),
       })),
+      lowStockcount: lowStockcount,
     });
   } catch (error) {
     res.status(500).json({

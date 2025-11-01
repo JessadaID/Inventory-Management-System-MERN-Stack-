@@ -6,7 +6,7 @@ import {
   TrendingUp,
   Plus,
   Search,
-  Bell,
+  Bell, 
   LogOut,
   Menu,
   X,
@@ -17,7 +17,7 @@ const Dashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [Movement, setMovement] = useState([]);
-  const [Products, setProducts] = useState([]);
+  const [Products, setProducts] = useState({ products: [], total: 0 });
 
   useEffect(() => {
     async function fetchMovements() {
@@ -37,13 +37,14 @@ const Dashboard = () => {
           "http://localhost:3000/api/products?limit=5"
         );
         const data = await response.json();
-        setProducts(data.products);
+        setProducts(data);
         } catch (error) {
         console.error("Error fetching products:", error);
       }
     }
 
     fetchProducts();
+    console.log(Products);
     fetchMovements();
   }, []);
 
@@ -51,14 +52,14 @@ const Dashboard = () => {
   const stats = [
     {
       title: "สินค้าทั้งหมด",
-      value: "1,234",
+      value: Products.total,
       icon: Package,
       color: "bg-blue-50 text-blue-600",
       trend: "+12%",
     },
     {
       title: "สต็อกต่ำ",
-      value: "23",
+      value: Products.lowStockcount || 0,
       icon: AlertCircle,
       color: "bg-red-50 text-red-600",
       trend: "-5%",
@@ -282,7 +283,7 @@ const Dashboard = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {Products.map((product) => (
+                    {Products.products && Products.products.map((product) => (
                       <tr
                         key={product._id}
                         className="border-b border-gray-100 hover:bg-gray-50"
