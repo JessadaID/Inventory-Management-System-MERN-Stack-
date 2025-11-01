@@ -13,8 +13,10 @@ import {
   ChevronRight,
 } from "lucide-react";
 import moneyFormat from "../utils/moneyformat";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [Movement, setMovement] = useState([]);
@@ -47,6 +49,11 @@ const Dashboard = () => {
     fetchProducts();
     fetchMovements();
   }, []);
+
+  function Logout(){
+    localStorage.removeItem("token");
+    navigate("/");
+  }
 
   // Mock data
   const stats = [
@@ -135,8 +142,8 @@ const Dashboard = () => {
                 </p>
                 <p className="text-xs text-gray-500">admin@stockflow.com</p>
               </div>
-              <button className="text-gray-400 hover:text-gray-600">
-                <LogOut className="w-5 h-5" />
+              <button className="text-gray-400 hover:text-gray-600" onClick={Logout}>
+                <LogOut className="w-5 h-5"/>
               </button>
             </div>
           </div>
