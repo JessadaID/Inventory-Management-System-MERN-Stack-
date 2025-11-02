@@ -11,7 +11,6 @@ function Navbar() {
     const result = await logout();
     if (result.success) {
       setUser(null);
-      alert("ออกจากระบบสำเร็จ");
       navigate("/");
     } else {
       alert("เกิดข้อผิดพลาดในการออกจากระบบ");

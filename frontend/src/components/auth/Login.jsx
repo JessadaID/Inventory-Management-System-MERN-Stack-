@@ -1,7 +1,8 @@
 import { useState, useContext } from "react";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { Link } from "react-router-dom";
-import  UserContext  from "../../context/userContext.jsx";
+import UserContext from "../../context/userContext.jsx";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -9,9 +10,9 @@ function Login() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { setUser } = useContext(UserContext);
-
+  const navigate = useNavigate();
+  
   const handleSubmit = async () => {
-
     try {
       setIsLoading(true);
 
@@ -28,13 +29,18 @@ function Login() {
 
       if (data.success) {
         setUser(data.user);
-        alert("เข้าสู่ระบบสำเร็จ!");
+        
+        if (data.user.role === "admin") {
+          navigate("/dashboard");
+        }else{
+          navigate("/");
+        }
       } else {
         alert(`เข้าสู่ระบบไม่สำเร็จ: ${data.message}`);
       }
     } catch (error) {
       console.error("Login failed:", error);
-    }finally {
+    } finally {
       setIsLoading(false);
     }
   };
