@@ -6,15 +6,15 @@ import {
   TrendingUp,
   Plus,
   Search,
-  Bell, 
+  Bell,
   LogOut,
   Menu,
   X,
   ChevronRight,
 } from "lucide-react";
-import moneyFormat from "../utils/moneyformat";
-import logout from "./auth/Logout";
-import UserContext from "../context/userContext";
+import moneyFormat from "../../utils/moneyformat";
+import logout from "../auth/Logout";
+import UserContext from "../../context/userContext";
 import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
@@ -44,7 +44,7 @@ const Dashboard = () => {
         );
         const data = await response.json();
         setProducts(data);
-        } catch (error) {
+      } catch (error) {
         console.error("Error fetching products:", error);
       }
     }
@@ -57,7 +57,6 @@ const Dashboard = () => {
     const result = await logout();
     if (result.success) {
       setUser(null);
-      alert("ออกจากระบบสำเร็จ");
       navigate("/");
     } else {
       alert("เกิดข้อผิดพลาดในการออกจากระบบ");
@@ -143,16 +142,23 @@ const Dashboard = () => {
           <div className="bg-gray-50 rounded-lg p-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
-                <span className="text-sm font-semibold text-gray-700">{user?.name?.substring(0, 2).toUpperCase() || 'AD'}</span>
+                <span className="text-sm font-semibold text-gray-700">
+                  {user?.name?.substring(0, 2).toUpperCase() || "AD"}
+                </span>
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-800 truncate">
-                  {user?.name || 'Admin User'}
+                  {user?.name || "Admin User"}
                 </p>
-                <p className="text-xs text-gray-500">{user?.email || 'admin@stockflow.com'}</p>
+                <p className="text-xs text-gray-500">
+                  {user?.email || "admin@stockflow.com"}
+                </p>
               </div>
-              <button className="text-gray-400 hover:text-gray-600" onClick={handleLogout}>
-                <LogOut className="w-5 h-5"/>
+              <button
+                className="text-gray-400 hover:text-gray-600"
+                onClick={handleLogout}
+              >
+                <LogOut className="w-5 h-5" />
               </button>
             </div>
           </div>
@@ -299,44 +305,45 @@ const Dashboard = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {Products.products && Products.products.map((product) => (
-                      <tr
-                        key={product._id}
-                        className="border-b border-gray-100 hover:bg-gray-50"
-                      >
-                        <td className="py-4 px-6">
-                          <p className="font-medium text-gray-800">
-                            {product.name}
-                          </p>
-                        </td>
-                        <td className="py-4 px-6 text-gray-600">
-                          {product.sku}
-                        </td>
-                        <td className="py-4 px-6 text-gray-600">
-                          {product.category.name}
-                        </td>
-                        <td className="py-4 px-6 font-medium text-gray-800">
-                          {product.stockCount}
-                        </td>
-                        <td className="py-4 px-6">
-                          <span
-                            className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
-                              product.stockLevel === "High"
-                                ? "bg-green-50 text-green-700"
+                    {Products.products &&
+                      Products.products.map((product) => (
+                        <tr
+                          key={product._id}
+                          className="border-b border-gray-100 hover:bg-gray-50"
+                        >
+                          <td className="py-4 px-6">
+                            <p className="font-medium text-gray-800">
+                              {product.name}
+                            </p>
+                          </td>
+                          <td className="py-4 px-6 text-gray-600">
+                            {product.sku}
+                          </td>
+                          <td className="py-4 px-6 text-gray-600">
+                            {product.category.name}
+                          </td>
+                          <td className="py-4 px-6 font-medium text-gray-800">
+                            {product.stockCount}
+                          </td>
+                          <td className="py-4 px-6">
+                            <span
+                              className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
+                                product.stockLevel === "High"
+                                  ? "bg-green-50 text-green-700"
+                                  : product.stockLevel === "Normal"
+                                  ? "bg-yellow-50 text-yellow-700"
+                                  : "bg-red-50 text-red-700"
+                              }`}
+                            >
+                              {product.stockLevel === "High"
+                                ? "ปกติ"
                                 : product.stockLevel === "Normal"
-                                ? "bg-yellow-50 text-yellow-700"
-                                : "bg-red-50 text-red-700"
-                            }`}
-                          >
-                            {product.stockLevel === "High"
-                              ? "ปกติ"
-                              : product.stockLevel === "Normal"
-                              ? "ต่ำ"
-                              : "วิกฤต"}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
+                                ? "ต่ำ"
+                                : "วิกฤต"}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
                   </tbody>
                 </table>
               </div>
@@ -367,7 +374,7 @@ const Dashboard = () => {
                           ? "รับเข้าสินค้า"
                           : activity.type === "OUTBOUND"
                           ? "เบิกออก"
-                          : "เพิ่มสินค้าใหม่"    }
+                          : "เพิ่มสินค้าใหม่"}
                       </p>
                       <p className="text-sm text-gray-600 truncate">
                         {activity.product.name}
@@ -378,7 +385,10 @@ const Dashboard = () => {
                         </p>
                       )}
                       <p className="text-xs text-gray-400 mt-1">
-                        {activity.updatedAt.toLocaleString().replace("T", " ").slice(0, 19)}
+                        {activity.updatedAt
+                          .toLocaleString()
+                          .replace("T", " ")
+                          .slice(0, 19)}
                       </p>
                     </div>
                   </div>

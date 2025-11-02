@@ -1,20 +1,43 @@
-import { useState } from 'react';
+import { useState , useContext } from 'react';
 import { Mail, Lock, Eye, EyeOff, User } from 'lucide-react';
 import { Link } from 'react-router-dom';
-
+import UserContext  from '../../context/userContext.jsx';
+import { useNavigate } from 'react-router-dom';
 function Register() {
+  const { setUser } = useContext(UserContext);
   const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setIsLoading(true);
-    setTimeout(() => {
+    try {
+      const respond = await fetch('http://localhost:3000/api/users/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      const data = await respond.json();
+
+      if (data.success) {
+        setUser(data.user);
+        alert('สมัครสมาชิกสำเร็จ!');
+        navigate('/');
+      } else {
+        alert(`สมัครสมาชิกไม่สำเร็จ: ${data.message}`);
+      }
+    } catch (error) {
+      console.error('Registration failed:', error);
+    }finally {
       setIsLoading(false);
-      alert('สมัครสมาชิกสำเร็จ!');
-    }, 1500);
+    }
   };
 
   return (

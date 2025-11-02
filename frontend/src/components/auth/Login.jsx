@@ -32,11 +32,10 @@ function Login() {
       } else {
         alert(`เข้าสู่ระบบไม่สำเร็จ: ${data.message}`);
       }
-
-      setIsLoading(false);
-
     } catch (error) {
       console.error("Login failed:", error);
+    }finally {
+      setIsLoading(false);
     }
   };
 

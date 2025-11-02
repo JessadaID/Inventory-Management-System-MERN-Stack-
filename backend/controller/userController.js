@@ -58,6 +58,12 @@ const registerUser = async (req, res) => {
 
     const newUser = await User.create(user);
 
+    const token = generateToken({
+      id: newUser._id,
+      email: newUser.email,
+      name: newUser.name,
+      role: newUser.role,
+    });
     // ส่ง token เป็น cookie
     res.cookie("token", token, {
       httpOnly: true, // ป้องกัน JavaScript เข้าถึง
