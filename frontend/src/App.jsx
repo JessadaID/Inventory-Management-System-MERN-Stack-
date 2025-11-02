@@ -6,6 +6,8 @@ import Login from "./components/auth/Login.jsx";
 import Register from "./components/auth/Register.jsx";
 import { Route, Routes, useLocation } from "react-router-dom";
 import { ProtectedRoute } from "./components/ProtectedRoute.jsx";
+import StaffInventory from "./components/page/StaffInventory.jsx";
+
 function App() {
   const location = useLocation();
   const hideNavbarPaths = ["/dashboard"];
@@ -18,7 +20,7 @@ function App() {
       <UserProvider>
         {shouldShowNavbar && <Navbar />}
         <Routes>
-          <Route path="/" element={<h1>Home Page</h1>} />
+          <Route path="/" element={<StaffInventory />} />
           <Route
             path="/dashboard"
             element={
